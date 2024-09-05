@@ -12,7 +12,7 @@ import lombok.*;
 @Getter @Setter //실무에선 가급적 Setter 피하기
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//기본 생성자 막고싶지만 JPA 스펙상 PROTECTED로 열어둠
 @ToString(of = {"id","username","age"}) //가급적 내부 필드만 (연관관계 없는 필드)
-public class Member {
+public class Member extends JpaBaseEntity{
 
     @Id
     @GeneratedValue

@@ -131,4 +131,23 @@ public class MemberRepositoryTest {
 
         em.flush(); // Update Query 가 실행되지 않음.(readOnly)
     }
+
+    //jpa 베이스 엔티티
+    @Test
+    public void JpaEventBaseEntity() throws Exception{
+        //given
+        Member member = new Member("member1");
+        memberRepository.save(member); //@PrePersist
+        Thread.sleep(100);
+        member.setUsername("member2");
+        em.flush(); //@PreUpdate
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findById(member.getId()).get();
+
+        //then
+        System.out.println("findMember 만들어진 시간 = "+findMember.getCreatedDate());
+        System.out.println("findMember 수정된 시간 = "+findMember.getUpdatedDate());
+    }
 }

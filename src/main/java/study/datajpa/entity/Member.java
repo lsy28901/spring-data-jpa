@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+@NamedEntityGraph(name = "Member.all",attributeNodes = @NamedAttributeNode("team"))
 @Entity
 @NamedQuery( //NamedQuery 정의하기
         name = "Member.findByUsername",

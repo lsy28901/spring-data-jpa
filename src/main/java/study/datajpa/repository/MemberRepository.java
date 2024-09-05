@@ -1,5 +1,7 @@
 package study.datajpa.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -52,6 +54,25 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
      * 결과가 없으면 ? -> null 반환 (원래는 NoResultException 인데 이 예외 무시하고 null 반환) ,
      * 결과가 2건 이상 : NonUniqueResultException 예외 발생
      */
+
+    /**
+     * 스프링 데이터 JPA 페이징과 정렬
+     * Pageable ( 내부에 Sort 포함)
+     * Page : 추가 count 쿼리 결과를 포함하는 페이징
+     * Slice : 추가 count 쿼리 없이 다음 페이지만 확인 가능 (내부적으로 limit+1 조회)
+     * List 자바 컬렉션 : 추가 count 쿼리 없이 결과만 반환함
+     * Page<Member> findByUsername(String name, Pageable pageable);  //count 쿼리 사용
+     * Slice<Member> findByUsername(String name, Pageable pageable); //count 쿼리 사용 안함
+     * List<Member> findByUsername(String name, Pageable pageable);  //count 쿼리 사용 안함
+     * List<Member> findByUsername(String name, Sort sort);
+     */
+    Page<Member> findByAge(int age, Pageable pageable);
+
+    //count 쿼리를 분리할 수 있다 -> 복잡한 sql에서 사용, 데이터는 left join, 카운트는 left join 안해도 된다.
+    @Query(value = "select m from Member m",
+            countQuery = "select count(m.username) from Member m")
+    Page<Member> findMemberAllCountBy(Pageable pageable);
+
 
 
 }

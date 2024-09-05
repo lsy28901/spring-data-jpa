@@ -93,4 +93,22 @@ public class MemberRepositoryTest {
 
 
     }
+
+    //벌크성 수정 쿼리 테스트
+    @Test
+    public void bulkUpdate() throws Exception{
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        //when - age 가 20 이상인 member 는 age + 1
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        //then
+        assertThat(resultCount).isEqualTo(3);
+
+    }
 }

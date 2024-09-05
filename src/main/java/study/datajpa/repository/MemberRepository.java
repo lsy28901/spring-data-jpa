@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.entity.Member;
@@ -72,6 +73,20 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     @Query(value = "select m from Member m",
             countQuery = "select count(m.username) from Member m")
     Page<Member> findMemberAllCountBy(Pageable pageable);
+
+    //스프링 데이터 JPA 로 벌크성 수정 쿼리
+    //벌크성 수정,삭제 쿼리는 @Modifying 사용함
+    //사용하지 않으면 QueryExecutionRequestException 발생
+    //벌크성 쿼리 실행하고 영속성 컨텍스트 초기화 방법 @Modifying(clearAutomatically = ture) 디폴트는 false임
+    //clearAutomatically = true 옵션 없이 회원을 findById로 다시 조회하면 영속성 컨텍스트에 과거 값이 남아 문제가 될수 있다.
+    //다시 조회 해야하면 영속성 컨텍스트를 초기화 하도록 하자.
+    //참고로 벌크 연산은 영속성 컨텍스트를 무시하고 실행하기 때문에, 영속성 컨텍스트에 있는 엔티티 상태와 DB의 엔티티 상태가 다를 수 있음.
+    //해결 방법
+    //영속성 컨텍스트에 엔티티가 없는 상태에서 벌크 연산을 먼저 실행
+    //부득이하게 영속성 컨텍스트에 엔티티가 있으면 벌크 연산 직후 영속성 컨텍스트를 초기화
+    @Modifying
+    @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
 
 
 

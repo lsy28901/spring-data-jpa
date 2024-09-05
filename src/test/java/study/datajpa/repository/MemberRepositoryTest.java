@@ -2,6 +2,7 @@ package study.datajpa.repository;
 
 
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +23,10 @@ public class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    //쿼리힌트 테스트 사용위해 추가
+    @Autowired
+    EntityManager em;
 
     @Test
     public void testMember(){
@@ -110,5 +115,20 @@ public class MemberRepositoryTest {
         //then
         assertThat(resultCount).isEqualTo(3);
 
+    }
+    //쿼리 힌트 사용 확인
+    @Test
+    public void queryHint() throws Exception{
+
+        //given
+        memberRepository.save(new Member("member1",10));
+        em.flush();
+        em.clear();
+
+        //when
+        Member member = memberRepository.findReadOnlyByUsername("member1");
+        member.setUsername("member2");
+
+        em.flush(); // Update Query 가 실행되지 않음.(readOnly)
     }
 }

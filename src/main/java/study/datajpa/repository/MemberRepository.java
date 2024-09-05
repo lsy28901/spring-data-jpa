@@ -1,13 +1,12 @@
 package study.datajpa.repository;
 
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.entity.Member;
 
@@ -123,6 +122,23 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     @EntityGraph("Member.all")
     @Query("select m from Member m")
     List<Member> findMemberNamedEntityGraph();
+
+    /**
+     * JPA쿼리 힌트 ( SQL이 아닌 JPA 구현체에 제공하는 힌트)
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly",value = "true"))
+    Member findReadOnlyByUsername(String username);
+
+    //쿼리 힌트 Page 예제
+    @QueryHints(value = {@QueryHint(name = "org.hibernate.readOnly",value = "true")},
+                        forCounting = true)
+    //forCounting : 반환 타입으로 Page 가 적용되면 추가로 호출하는 페이징을 위한 count 쿼리도 쿼리 힌트를 적용함 (default = true)
+    Page<Member> findByUsername(String name,Pageable pageable);
+
+    //Lock
+//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+//    List<Member> findByUsername(String name);
+
 
 
 }
